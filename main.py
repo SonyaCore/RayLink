@@ -125,7 +125,7 @@ async def main():
         
         logger.info("Saving validated links...")
         metadata = {
-            'channels': args.channels,
+            'channels': channels,
             'scraping_timestamp': datetime.now().isoformat(),
             'version': __version__,
             'validation_enabled': True
