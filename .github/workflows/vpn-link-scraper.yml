@@ -1,0 +1,74 @@
+name: 🛡️ VPN Link Scraper
+
+on:
+  schedule:
+    - cron: "30 3 * * *"
+  workflow_dispatch:
+    inputs:
+      channels:
+        description: "Base64-encoded list of Telegram channels"
+        required: true
+        default: ""
+      test_timeout:
+        description: "Timeout for testing links (seconds)"
+        required: false
+        default: "15"
+
+jobs:
+  scrape-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Decode channels input
+        run: |
+          echo "${{ github.event.inputs.channels }}" | base64 -d > channels.txt
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run VPN link scraper
+        run: |
+          python3 main.py --input channels.txt \
+            --test-timeout ${{ github.event.inputs.test_timeout }}
+      - name: Upload links and logs
+        if: ${{ success() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: vpn-output-${{ github.run_number }}
+          path: |
+            links.txt
+            raplink.log
+            vpn_links.json
+          retention-days: 30
+
+      - name: Commit vpn_links.json to repository
+        if: ${{ success() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p data
+          mv vpn_links.json data/vpn_links.json
+          git add data/vpn_links.json
+          git commit -m "Add VPN links for run #${{ github.run_number }}"
+          git push origin HEAD:${{ github.ref_name }}
