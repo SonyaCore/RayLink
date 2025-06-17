@@ -1,43 +1,45 @@
 name: 🛡️ VPN Link Scraper
-
 permissions:
   contents: write
-
 on:
   schedule:
     - cron: "30 3 * * *"
   workflow_dispatch:
     inputs:
-      channels:
-        description: "Base64-encoded list of Telegram channels"
-        required: true
-        default: ""
       test_timeout:
         description: "Timeout for testing links (seconds)"
         required: false
         default: "15"
-
+      channels_url:
+        description: "URL to fetch channels list from"
+        required: false
+        default: "https://raw.githubusercontent.com/NaMiraNet/ChanExt/refs/heads/main/results/channels_latest.txt"
 jobs:
   scrape-and-test:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
-
-      - name: Decode channels input
+      
+      - name: Download channels list
         run: |
-          echo "${{ github.event.inputs.channels }}" | base64 -d > channels.txt
-
+          CHANNELS_URL="${{ github.event.inputs.channels_url }}"
+          if [ -z "$CHANNELS_URL" ]; then
+            CHANNELS_URL="https://raw.githubusercontent.com/NaMiraNet/ChanExt/refs/heads/main/results/channels_latest.txt"
+          fi
+          echo "Downloading channels from: $CHANNELS_URL"
+          curl -fsSL "$CHANNELS_URL" -o channels.txt
+          echo "Downloaded $(wc -l < channels.txt) lines"
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.13"
-
+          
       - name: Cache Python dependencies
         uses: actions/cache@v3
         with:
@@ -45,16 +47,16 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
-
+            
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
+          
       - name: Run VPN link scraper
         run: |
-          python3 main.py --input channels.txt \
-            --test-timeout ${{ github.event.inputs.test_timeout }}
+          python3 main.py --input channels.txt
+            
       - name: Upload links and logs
         if: ${{ success() }}
         uses: actions/upload-artifact@v4
@@ -65,7 +67,7 @@ jobs:
             raplink.log
             vpn_links.json
           retention-days: 30
-
+          
       - name: Commit vpn_links.json to repository
         if: ${{ success() }}
         run: |
@@ -73,6 +75,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           mkdir -p data
           mv vpn_links.json data/vpn_links.json
-          git add data/vpn_links.json
+          mv links.txt data/vpn_links.txt
+          git add data/vpn_links.json data/links.txt
           git commit -m "Add VPN links for run #${{ github.run_number }}"
           git push origin HEAD:${{ github.ref_name }}
