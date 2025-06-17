@@ -78,6 +78,6 @@ jobs:
           mkdir -p data
           mv vpn_links.json data/vpn_links.json
           mv links.txt data/vpn_links.txt
-          git add data/vpn_links.json data/links.txt
+          git add data/vpn_links.json data/vpn_links.txt
           git commit -m "Add VPN links for run #${{ github.run_number }}"
           git push origin HEAD:${{ github.ref_name }}
