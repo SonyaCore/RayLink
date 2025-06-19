@@ -16,7 +16,7 @@ import manager
 
 from utils import read_channels_from_file
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 # Configure logging
 logging.basicConfig(
