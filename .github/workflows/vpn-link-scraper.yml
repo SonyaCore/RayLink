@@ -56,8 +56,14 @@ jobs:
           pip install -r requirements.txt
           
       - name: Run VPN link scraper
+        env:
+          NAMIRA_XAPI: ${{ secrets.NAMIRA_XAPI }}
+          NAMIRA_URL: ${{ secrets.NAMIRA_URL }}
         run: |
-          python3 main.py --input channels.txt
+          python3 main.py \
+            --input channels.txt \
+            --namira_xapi "$NAMIRA_XAPI" \
+            --namira_url "$NAMIRA_URL"
             
       - name: Upload links and logs
         if: ${{ success() }}
