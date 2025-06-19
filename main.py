@@ -81,6 +81,38 @@ class ChannelScraper:
         
         return combined_links
 
+class NamiraInterface:
+    """Interface to communicate with the Go rayping service"""
+    
+    def __init__(self, namira_xapi: str , namira_url: str = "http://localhost:8080"):
+        self.service_url = namira_url
+        self.xapi = namira_xapi
+    
+    async def send_links(self, links_file: str = "links.txt") -> Dict:
+        """Send links to namira service for scanning"""
+        try:
+            headers = {"X-API-Key": self.xapi}
+            async with aiohttp.ClientSession(headers=headers) as session:
+                with open(links_file, 'rb') as f:
+                    data = aiohttp.FormData()
+                    data.add_field('file', f, filename='links.txt')
+                    
+                    async with session.post(
+                        f"{self.service_url}/scan",
+                        data=data,
+                        timeout=aiohttp.ClientTimeout(total=100)
+                    ) as response:
+                        if response.status == 200:
+                            result = await response.json()
+                            logger.info(f"namira data has been send to uri")
+                            return result
+                        else:
+                            logger.error(f"namira service error: {response.status}")
+                            return {}
+        except Exception as e:
+            logger.error(f"Error communicating with rayping service: {e}")
+            return {}
+
 
 async def main():
     parser = argparse.ArgumentParser(description='RapLink Service - VPN Link Scraper and Tester')
@@ -88,8 +120,11 @@ async def main():
                       help='List of Telegram channels to scrape')
     parser.add_argument('--output', default='vpn_links.json',
                       help='Output file for scraped links')
-    parser.add_argument('--rayping-url', default='http://localhost:8080',
-                      help='URL of the rayping service')
+    parser.add_argument('--namira-url', default='http://localhost:8080',
+                      help='URL of the namira service')
+    parser.add_argument('--namira-xapi', default='namira-xapi',
+                      help='X-API key for namira service')
+        
     parser.add_argument('--test-timeout', type=int, default=10,
                       help='Timeout for link testing in seconds')
     parser.add_argument('--export-only', action='store_true',
@@ -111,6 +146,7 @@ async def main():
     # Initialize components
     scraper = ChannelScraper(channels)
     link_manager = manager.LinkManager(args.output)
+    namira = NamiraInterface(args.namira_xapi , args.namira_url)
     
     try:
         logger.info("Starting channel scrape...")
@@ -135,6 +171,13 @@ async def main():
         logger.info("Exporting links for testing...")
         link_manager.export_for_testing(links)
         
+        if args.export_only:
+            logger.info("Export-only mode. Exiting.")
+            return
+        
+        logger.info("Sending links to namira service")
+        await namira.send_links()
+               
         logger.info("Scraping completed successfully!")
         
     except Exception as e:
