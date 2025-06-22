@@ -12,6 +12,7 @@ import base
 
 _logger = logging.getLogger(__name__)
 _SINGLE_MEDIA_LINK_PATTERN = re.compile(r'^https://t\.me/[^/]+/\d+\?single$')
+MAX_FETCH = 200
 
 
 # ============================================================================
@@ -325,7 +326,7 @@ class TelegramChannelScraper(base.Scraper):
             return
             
         post_count = 0
-        max_posts = 1000
+        max_posts = MAX_FETCH
         
         while post_count < max_posts:
             posts_yielded_this_page = 0
