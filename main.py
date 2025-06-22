@@ -13,6 +13,7 @@ import scrapper
 import extractor
 import duplicate
 import manager
+import aiohttp
 
 from utils import read_channels_from_file
 
