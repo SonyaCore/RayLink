@@ -96,7 +96,7 @@ class NamiraInterface:
             async with aiohttp.ClientSession(headers=headers) as session:
                 with open(links_file, 'rb') as f:
                     data = aiohttp.FormData()
-                    data.add_field('file', f, filename='links.txt')
+                    data.add_field('file', f, filename='links.txt', content_type='text/plain')
                     
                     async with session.post(
                         f"{self.service_url}/scan",
