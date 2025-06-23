@@ -153,11 +153,13 @@ class NamiraInterface:
                     else:
                         logger.error(f"namira service error: {response.status}")
                         return {}
-        except Exception as e:
-            logger.error(f"Error communicating with namira service: {e}")
+        except Exception:
+            logger.error(
+                "Error communicating with rayping service on %s:\n%s",
+                self.service_url,
+                traceback.format_exc(),
+            )
             return {}
-
-
 
 
 
