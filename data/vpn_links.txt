@@ -693,6 +693,7 @@ vless://a5944f30-eeb5-4f56-8bfe-dd8ae7377fa0@tamizokatamizveryclearifiedtamiz.iv
 vless://c9e3ab1c-897d-4be3-a0cf-f6ac608026ae@fast.thuglife.ir:80?path=WEDBAZ%3Fed%3D2048&security=none&encryption=none&host=Turkey.ss.ss&type=ws#👉🆔@v2ray_configs_pool📡🇺🇸®️United
 vless://b95b0e04-f7af-4949-b275-a3b46f176d16@sezar.ihomayon.com:49864?security=none&encryption=none&headerType=http&type=tcp#👉🆔@v2ray_configs_pool📡🇮🇷®️Iran©️Tehran
 vless://fbddfda5-cf1f-4bf4-acbc-a60555541beb@46.102.157.79:58105?security=&fp=chrome&type=tcp&headerType=http&host=myket.ir&encryption=none#👉🆔@v2ray_configs_pool📡🇦🇹®️Austria©️Langenzersdorf🅿️ping:70.35ms
+vless://0b83624e-ca3f-4761-9b77-954a49f608e4@188.227.84.74:8443?security=none&encryption=none&host=zula.ir&headerType=http&type=tcpتعداد
 vless://f5e4ce3c-1ade-491d-9b5d-ab87cef79b9a@tak.domuuss.com:40179?path=%2F&security=none&encryption=none&host=telewebion.com&type=wsتعداد
 vless://1194e0f3-f2a4-46d7-fa68-eb05e0bb9874@ir.pingxbaz.com:2087?security=none&encryption=none&host=Speedtest.net&headerType=http&type=tcpتعداد
 vless://739e822a-a8d3-4bc2-ba0e-2a948a269ec0@shard3fobon.maniyadg7shard.ir:80?path=%2Fshard9promax%3Fed%3D2048&security=none&encryption=none&host=shardcompanygold2.com&type=wsتعداد
