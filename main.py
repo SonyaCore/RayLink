@@ -171,7 +171,7 @@ async def main():
     # Initialize components
     scraper = ChannelScraper(channels)
     link_manager = manager.LinkManager(args.output)
-    namira = NamiraInterface(args.namira_xapi, args.namira_url)
+    # namira = NamiraInterface(args.namira_xapi, args.namira_url)
 
     try:
         logger.info("Starting channel scrape...")
