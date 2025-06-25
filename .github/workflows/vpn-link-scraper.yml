@@ -3,7 +3,7 @@ permissions:
   contents: write
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "*/8 * * * *"
   workflow_dispatch:
     inputs:
       test_timeout:
