@@ -11,7 +11,7 @@ on:
       channels_url:
         description: "URL to fetch channels list from"
         required: false
-        default: "https://raw.githubusercontent.com/NaMiraNet/ChanExt/refs/heads/main/results/channels_latest.txt"
+        default: "https://raw.githubusercontent.com/SonyaCore/RayChan/refs/heads/main/results/channels_latest.txt"
 jobs:
   scrape-and-test:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
         run: |
           CHANNELS_URL="${{ github.event.inputs.channels_url }}"
           if [ -z "$CHANNELS_URL" ]; then
-            CHANNELS_URL="https://raw.githubusercontent.com/NaMiraNet/ChanExt/refs/heads/main/results/channels_latest.txt"
+            CHANNELS_URL="https://raw.githubusercontent.com/SonyaCore/RayChan/refs/heads/main/results/channels_latest.txt"
           fi
           echo "Downloading channels from: $CHANNELS_URL"
           curl -fsSL "$CHANNELS_URL" -o channels_encoded.txt
