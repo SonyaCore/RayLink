@@ -83,7 +83,6 @@ class ChannelScraper:
 
         return combined_links
 
-
 # class NamiraInterface:
 #     """Interface to communicate with the Go rayping service"""
 
@@ -91,26 +90,34 @@ class ChannelScraper:
 #         self.service_url = namira_url
 #         self.xapi = namira_xapi
 
-#     async def send_links(self, links_file: str = "links.txt") -> Dict:
-#         """Send links to namira service for scanning"""
-#         headers = {"X-API-Key": self.xapi}
+#     async def send_links(self, links_dict: dict) -> Dict:
+#         """Send links from a dictionary to namira service (as in-memory file)"""
 #         try:
-#             async with aiohttp.ClientSession(headers=headers) as session:
-#                 with open(links_file, "rb") as f:
-#                     data = aiohttp.FormData()
-#                     data.add_field(
-#                         "file", f, filename="links.txt", content_type="text/plain"
-#                     )
+#             links_content = "\n".join(str(link) for link in links_dict.values())
 
-#                     async with session.post(
-#                         f"{self.service_url}/scan",
-#                         data=data,
-#                         timeout=aiohttp.ClientTimeout(total=100),
-#                     ) as response:
-#                         response.raise_for_status()
+#             headers = {"X-API-Key": self.xapi}
+#             async with aiohttp.ClientSession(headers=headers) as session:
+#                 data = aiohttp.FormData()
+#                 mem_file = io.BytesIO(links_content.encode("utf-8"))
+#                 data.add_field(
+#                     'file',
+#                     mem_file,
+#                     filename='links.txt',
+#                     content_type='text/plain'
+#                 )
+
+#                 async with session.post(
+#                     f"{self.service_url}/scan",
+#                     data=data,
+#                     timeout=aiohttp.ClientTimeout(total=100)
+#                 ) as response:
+#                     if response.status == 200:
 #                         result = await response.json()
-#                         logger.info("namira data has been send to uri")
+#                         logger.info("namira data has been sent to URI")
 #                         return result
+#                     else:
+#                         logger.error(f"namira service error: {response.status}")
+#                         return {}
 #         except Exception:
 #             logger.error(
 #                 "Error communicating with rayping service on %s:\n%s",
@@ -118,48 +125,6 @@ class ChannelScraper:
 #                 traceback.format_exc(),
 #             )
 #             return {}
-class NamiraInterface:
-    """Interface to communicate with the Go rayping service"""
-
-    def __init__(self, namira_xapi: str, namira_url: str = "http://localhost:8080"):
-        self.service_url = namira_url
-        self.xapi = namira_xapi
-
-    async def send_links(self, links_dict: dict) -> Dict:
-        """Send links from a dictionary to namira service (as in-memory file)"""
-        try:
-            links_content = "\n".join(str(link) for link in links_dict.values())
-
-            headers = {"X-API-Key": self.xapi}
-            async with aiohttp.ClientSession(headers=headers) as session:
-                data = aiohttp.FormData()
-                mem_file = io.BytesIO(links_content.encode("utf-8"))
-                data.add_field(
-                    'file',
-                    mem_file,
-                    filename='links.txt',
-                    content_type='text/plain'
-                )
-
-                async with session.post(
-                    f"{self.service_url}/scan",
-                    data=data,
-                    timeout=aiohttp.ClientTimeout(total=100)
-                ) as response:
-                    if response.status == 200:
-                        result = await response.json()
-                        logger.info("namira data has been sent to URI")
-                        return result
-                    else:
-                        logger.error(f"namira service error: {response.status}")
-                        return {}
-        except Exception:
-            logger.error(
-                "Error communicating with rayping service on %s:\n%s",
-                self.service_url,
-                traceback.format_exc(),
-            )
-            return {}
 
 
 
@@ -235,8 +200,8 @@ async def main():
             logger.info("Export-only mode. Exiting.")
             return
 
-        logger.info("Sending links to namira service")
-        await namira.send_links(links)
+        # logger.info("Sending links to namira service")
+        # await namira.send_links(links)
 
         logger.info("Scraping completed successfully!")
 
